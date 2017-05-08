@@ -5,3 +5,8 @@ AuthorUrl: https://mhelena.github.io/
 Tags: snmf
 DisplayMode: Showcase
 Type: Shiny
+
+References: 
+  https://shiny.rstudio.com/reference/shiny/latest/
+  https://shiny.rstudio.com/reference/shiny/latest/sliderInput.html
+  
