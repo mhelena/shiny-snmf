@@ -1,28 +1,49 @@
 library(shiny)
 
-pageWithSidebar(
+shinyUI(fluidPage(
   
-  headerPanel('SNMF'),
+  titlePanel("SNMF"),
   
-  sidebarPanel(
-    
-    fileInput("genoFile", "Choose geno File",
-              accept = c(".geno")),
-    
-    sliderInput("k",
-                "K:",
-                min = 1,
-                max = 20,
-                value = c(1,20))
-    
-    #selectInput('xcol', 'X Variable', names(iris)),
-    #selectInput('ycol', 'Y Variable', names(iris), selected=names(iris)[[2]]),
-    #numericInput('clusters', 'Cluster count', 3, min = 1, max = 9)
+  sidebarLayout(
+    sidebarPanel( 
+      fileInput("genoFile", 
+                "Choose geno File",
+                accept = c(".geno")),
+                  
+      sliderInput("k",
+                  "K:",
+                  min = 1,
+                  max = 20,
+                  value = c(1,10))
+      ),
+    mainPanel(
+      plotOutput('plot1')
+    )
   ),
   
-  mainPanel(
-    textOutput("text1"),
-    plotOutput('plot1')
+  sidebarLayout(
+    sidebarPanel(
+
+      sliderInput("selectedk",
+                  "Pick K:",
+                  min = 1,
+                  max = 20,
+                  value = 2)
+    ),
+    mainPanel(
+      plotOutput('qMatrixPlot')
+    )
+  ),
+  
+  sidebarLayout(
+    sidebarPanel(
+      numericInput("lambdaValue", "Lambda:", 0)
+    ),
+    mainPanel(
+      plotOutput('histogram')
+    )
   )
   
-)
+))
+
+
