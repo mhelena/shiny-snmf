@@ -39,12 +39,11 @@ function(input, output, session) {
   })
   
   adjPValues <- reactive({
-    #fst.values = fst(snmfObject(), K=input$selectedk)
+    
     fst.values = fstValues()
     
     #convert fst values into z-scores (absolute values) 
     n = dim(Q(snmfObject(), K = input$selectedk))[1]
-    #fst.values[fst.values < 0] = 0.000001
     K = input$selectedk
     z.scores = sqrt(fst.values*(n-K)/(1-fst.values))
     
@@ -54,16 +53,10 @@ function(input, output, session) {
       updateNumericInput(session, "lambdaValue", value = lambda)
     }
     
-    #adj.p.values = pchisq(z.scores^2/input$lambdaValue, df = K-1, lower = FALSE)
     pchisq(z.scores^2/input$lambdaValue, df = K-1, lower = FALSE)
   })
   
-  output$text1 <- renderText({ 
-    paste("You have chosen a K range that goes from",
-          input$k[1], "to", input$k[2])
-  })
-  
-  output$plot1 <- renderPlot({
+  output$ancestralPopulationVector <- renderPlot({
     
     inFile <- input$genoFile
     if (is.null(inFile))
@@ -98,7 +91,7 @@ function(input, output, session) {
     if (is.null(inFile))
       return(NULL)
     
-    falseDiscoveriesControl(snmfObject(), input$selectedk, adjPValues(), fstValues())
+    falseDiscoveriesControl(snmfObject(), input$selectedk, input$selectedQ, adjPValues(), fstValues())
   })
 
 }
