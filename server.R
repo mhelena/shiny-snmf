@@ -4,6 +4,7 @@ biocLite("LEA")
 library(LEA)
 
 source("helpers.R")
+source("falseDiscoveriesControl.R")
 
 function(input, output, session) {
 
@@ -30,12 +31,32 @@ function(input, output, session) {
     
   })
   
-  output$text1 <- renderText({ 
-    paste("You have chosen a K range that goes from",
-          input$k[1], "to", input$k[2])
+  fstValues <- reactive({
+    fst.values = fst(snmfObject(), K=input$selectedk)
+    fst.values[fst.values < 0] = 0.000001
+    
+    fst.values
   })
   
-  output$plot1 <- renderPlot({
+  adjPValues <- reactive({
+    
+    fst.values = fstValues()
+    
+    #convert fst values into z-scores (absolute values) 
+    n = dim(Q(snmfObject(), K = input$selectedk))[1]
+    K = input$selectedk
+    z.scores = sqrt(fst.values*(n-K)/(1-fst.values))
+    
+    lambda = median(z.scores^2)/qchisq(1/2, df = K-1)
+    
+    if (input$lambdaValue < 1) {
+      updateNumericInput(session, "lambdaValue", value = lambda)
+    }
+    
+    pchisq(z.scores^2/input$lambdaValue, df = K-1, lower = FALSE)
+  })
+  
+  output$ancestralPopulationVector <- renderPlot({
     
     inFile <- input$genoFile
     if (is.null(inFile))
@@ -62,23 +83,15 @@ function(input, output, session) {
     if (is.null(inFile))
       return(NULL)
     
-    fst.values = fst(snmfObject(), K=input$selectedk)
+    hist(adjPValues(), col = "red")
+  })
+  
+  output$falseDiscoveryControl <- renderPlot({
+    inFile <- input$genoFile
+    if (is.null(inFile))
+      return(NULL)
     
-    #convert fst values into z-scores (absolute values) 
-    n = dim(Q(snmfObject(), K = input$selectedk))[1]
-    fst.values[fst.values < 0] = 0.000001
-    K = input$selectedk
-    z.scores = sqrt(fst.values*(n-K)/(1-fst.values))
-    
-    lambda = median(z.scores^2)/qchisq(1/2, df = K-1)
-    
-    if (input$lambdaValue < 1) {
-      updateNumericInput(session, "lambdaValue", value = lambda)
-    }
-    
-    adj.p.values = pchisq(z.scores^2/input$lambdaValue, df = K-1, lower = FALSE)
-    
-    hist(adj.p.values, col = "red")
+    falseDiscoveriesControl(snmfObject(), input$selectedk, input$selectedQ, adjPValues(), fstValues())
   })
 
 }

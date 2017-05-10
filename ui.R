@@ -2,7 +2,7 @@ library(shiny)
 
 shinyUI(fluidPage(
   
-  titlePanel("SNMF"),
+  titlePanel("snmf"),
   
   sidebarLayout(
     sidebarPanel( 
@@ -17,7 +17,7 @@ shinyUI(fluidPage(
                   value = c(1,10))
       ),
     mainPanel(
-      plotOutput('plot1')
+      plotOutput('ancestralPopulationVector')
     )
   ),
   
@@ -37,10 +37,19 @@ shinyUI(fluidPage(
   
   sidebarLayout(
     sidebarPanel(
-      numericInput("lambdaValue", "Lambda:", 0)
+      numericInput("lambdaValue", "gif:", 0)
     ),
     mainPanel(
       plotOutput('histogram')
+    )
+  ),
+  
+  sidebarLayout(
+    sidebarPanel(
+      numericInput("selectedQ", "q:", 0.1)
+    ),
+    mainPanel(
+      plotOutput('falseDiscoveryControl')
     )
   )
   
