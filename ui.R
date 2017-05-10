@@ -42,6 +42,13 @@ shinyUI(fluidPage(
     mainPanel(
       plotOutput('histogram')
     )
+  ),
+  
+  sidebarLayout(
+    sidebarPanel(),
+    mainPanel(
+      plotOutput('falseDiscoveryControl')
+    )
   )
   
 ))
